@@ -1,3 +1,0 @@
-A
-+-- B [depth limit]
-\-- C [depth limit]

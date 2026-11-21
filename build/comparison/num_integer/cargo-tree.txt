@@ -1,2 +1,0 @@
-0num-integer v0.1.46
-1num-traits v0.2.19

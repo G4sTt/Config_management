@@ -1,7 +1,0 @@
-digraph dependencies {
-  rankdir=LR;
-  node [shape=box];
-  "either@1.19.0";
-  "itertools@0.13.0" [penwidth=2];
-  "itertools@0.13.0" -> "either@1.19.0";
-}

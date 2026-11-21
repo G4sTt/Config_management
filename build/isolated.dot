@@ -1,5 +1,0 @@
-digraph dependencies {
-  rankdir=LR;
-  node [shape=box];
-  "A" [penwidth=2];
-}
