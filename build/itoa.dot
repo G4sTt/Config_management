@@ -1,0 +1,5 @@
+digraph dependencies {
+  rankdir=LR;
+  node [shape=box];
+  "itoa@1.0.15" [penwidth=2];
+}

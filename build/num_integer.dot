@@ -1,0 +1,7 @@
+digraph dependencies {
+  rankdir=LR;
+  node [shape=box];
+  "num-integer@0.1.46" [penwidth=2];
+  "num-traits@0.2.19";
+  "num-integer@0.1.46" -> "num-traits@0.2.19";
+}

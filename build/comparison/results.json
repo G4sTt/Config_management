@@ -1,0 +1,65 @@
+[
+  {
+    "case": "itoa",
+    "root": "itoa@1.0.15",
+    "nodes": [
+      "itoa@1.0.15"
+    ],
+    "edges": [],
+    "cargo_nodes": [
+      "itoa@1.0.15"
+    ],
+    "cargo_edges": [],
+    "match": true
+  },
+  {
+    "case": "num_integer",
+    "root": "num-integer@0.1.46",
+    "nodes": [
+      "num-integer@0.1.46",
+      "num-traits@0.2.19"
+    ],
+    "edges": [
+      [
+        "num-integer@0.1.46",
+        "num-traits@0.2.19"
+      ]
+    ],
+    "cargo_nodes": [
+      "num-integer@0.1.46",
+      "num-traits@0.2.19"
+    ],
+    "cargo_edges": [
+      [
+        "num-integer@0.1.46",
+        "num-traits@0.2.19"
+      ]
+    ],
+    "match": true
+  },
+  {
+    "case": "itertools",
+    "root": "itertools@0.13.0",
+    "nodes": [
+      "either@1.19.0",
+      "itertools@0.13.0"
+    ],
+    "edges": [
+      [
+        "itertools@0.13.0",
+        "either@1.19.0"
+      ]
+    ],
+    "cargo_nodes": [
+      "either@1.19.0",
+      "itertools@0.13.0"
+    ],
+    "cargo_edges": [
+      [
+        "itertools@0.13.0",
+        "either@1.19.0"
+      ]
+    ],
+    "match": true
+  }
+]

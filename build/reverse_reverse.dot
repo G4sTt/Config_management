@@ -1,0 +1,14 @@
+digraph dependencies {
+  rankdir=LR;
+  node [shape=box];
+  label="Reverse dependencies: required by";
+  "A";
+  "B" [penwidth=2];
+  "C";
+  "D";
+  "E";
+  "B" -> "A";
+  "B" -> "C";
+  "C" -> "D";
+  "D" -> "E";
+}

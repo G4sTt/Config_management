@@ -1,0 +1,9 @@
+digraph dependencies {
+  rankdir=LR;
+  node [shape=box];
+  "A" [penwidth=2];
+  "B";
+  "C";
+  "A" -> "B";
+  "A" -> "C";
+}
