@@ -9,7 +9,9 @@ from registry import Registry, download
 
 
 class HttpTests(unittest.TestCase):
+    """Check HTTP retries, failures and metadata validation."""
     def test_transient_http_error_is_retried(self):
+        """Verify transient http error is retried."""
         transient = HTTPError("https://test", 503, "busy", {}, None)
         with patch("registry.urlopen",
                    side_effect=[transient, io.BytesIO(b"hello")]) as opener:
@@ -18,6 +20,7 @@ class HttpTests(unittest.TestCase):
         self.assertEqual(opener.call_count, 2)
 
     def test_not_found_and_connection_failures(self):
+        """Verify not found and connection failures."""
         for failure in (
             HTTPError("https://test", 404, "missing", {}, None),
             URLError("connection failed"), TimeoutError("timeout"),
@@ -28,6 +31,7 @@ class HttpTests(unittest.TestCase):
                         download("https://test")
 
     def test_malformed_registry_shapes(self):
+        """Verify malformed registry shapes."""
         for response in (
             "", "[]", '{"vers":"1.0.0","deps":{}}',
             '{"vers":"1.0.0","deps":[{}]}',

@@ -12,9 +12,8 @@ from settings import load_settings
 from visualize import ascii_tree, dot_graph
 
 
-def execute(options):
-    """Execute a selected stage while keeping DOT separate from the tree."""
-    settings = load_settings(options.config)
+def validate_output(options, settings):
+    """Check output-stage compatibility and protect input files."""
     protected = {options.config.resolve()}
     if settings.test_mode:
         protected.add(Path(settings.repository).resolve())
@@ -22,6 +21,24 @@ def execute(options):
         raise ValueError("Output must differ from the INI and repository files")
     if options.stage in {"config", "direct"} and options.output:
         raise ValueError("--output is supported for graph and reverse stages")
+
+
+def print_graph(options, settings):
+    """Print DOT and optionally save the diagram and display the tree."""
+    reverse = options.stage == "reverse"
+    graph = analyze(settings, reverse)
+    diagram = dot_graph(graph, reverse)
+    if options.output:
+        write_text(options.output, diagram)
+    print(diagram, end="")
+    if settings.ascii_tree:
+        print(ascii_tree(graph), file=sys.stderr, end="")
+
+
+def execute(options):
+    """Execute a selected stage while keeping DOT separate from the tree."""
+    settings = load_settings(options.config)
+    validate_output(options, settings)
     if options.stage == "config":
         for key, value in asdict(settings).items():
             print(f"{key}={value}")
@@ -32,14 +49,7 @@ def execute(options):
         for package in repository.dependencies(root):
             print(package)
     else:
-        reverse = options.stage == "reverse"
-        graph = analyze(settings, reverse)
-        diagram = dot_graph(graph, reverse)
-        if options.output:
-            write_text(options.output, diagram)
-        print(diagram, end="")
-        if settings.ascii_tree:
-            print(ascii_tree(graph), file=sys.stderr, end="")
+        print_graph(options, settings)
 
 
 def main():

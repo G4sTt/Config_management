@@ -9,6 +9,9 @@ from urllib.request import Request, urlopen
 from versions import satisfies, version
 
 USER_AGENT = "Conf2-CargoGraph-Variant13/1.0 (educational dependency analysis)"
+MAX_DOWNLOAD_ATTEMPTS = 3
+RETRYABLE_HTTP_CODES = {429, 500, 502, 503, 504}
+REVERSE_PAGE_SIZE = 100
 
 
 def validate_record(record):
@@ -34,18 +37,21 @@ class Package:
     release: str
 
     def __str__(self):
+        """Return the package identity used by graph labels."""
         return f"{self.name}@{self.release}"
 
 
 def download(url):
     """Download UTF-8 data with a timeout and bounded transient retries."""
-    for attempt in range(3):
+    last_attempt = MAX_DOWNLOAD_ATTEMPTS - 1
+    for attempt in range(MAX_DOWNLOAD_ATTEMPTS):
         try:
             request = Request(url, headers={"User-Agent": USER_AGENT})
             with urlopen(request, timeout=30) as response:
                 return response.read().decode("utf-8")
         except HTTPError as error:
-            if error.code not in {429, 500, 502, 503, 504} or attempt == 2:
+            if (error.code not in RETRYABLE_HTTP_CODES
+                    or attempt == last_attempt):
                 raise ValueError(f"HTTP {error.code}: {url}") from error
             time.sleep(0.5 * (attempt + 1))
         except (URLError, TimeoutError, UnicodeError) as error:
@@ -55,19 +61,16 @@ def download(url):
 def index_path(name):
     """Return the sparse-index path specified by the Cargo registry format."""
     name = name.lower()
-    if len(name) == 1:
-        return f"1/{name}"
-    if len(name) == 2:
-        return f"2/{name}"
-    if len(name) == 3:
-        return f"3/{name[0]}/{name}"
-    return f"{name[:2]}/{name[2:4]}/{name}"
+    short_prefixes = {1: "1", 2: "2", 3: f"3/{name[:1]}"}
+    prefix = short_prefixes.get(len(name), f"{name[:2]}/{name[2:4]}")
+    return f"{prefix}/{name}"
 
 
 class Registry:
     """Resolve non-optional normal dependencies from sparse-index records."""
 
     def __init__(self, url, fetch=download):
+        """Configure the HTTP source and an initially empty record cache."""
         self.url = url.rstrip("/")
         self.fetch = fetch
         self.cache = {}
@@ -133,7 +136,7 @@ class Registry:
         page = 1
         while True:
             url = (f"{api}/api/v1/crates/{package.name}/reverse_dependencies"
-                   f"?page={page}&per_page=100")
+                   f"?page={page}&per_page={REVERSE_PAGE_SIZE}")
             data = json.loads(self.fetch(url))
             items = data["dependencies"]
             versions = {item["id"]: item for item in data["versions"]}
@@ -144,7 +147,7 @@ class Registry:
                     continue
                 dependent = versions[item["version_id"]]
                 results.add(Package(dependent["crate"], dependent["num"]))
-            if page * 100 >= data["meta"]["total"]:
+            if page * REVERSE_PAGE_SIZE >= data["meta"]["total"]:
                 break
             page += 1
         return sorted(results)

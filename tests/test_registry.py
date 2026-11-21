@@ -8,7 +8,9 @@ from versions import satisfies
 
 
 class VersionTests(unittest.TestCase):
+    """Check Cargo version constraints and sparse-index paths."""
     def test_cargo_requirements(self):
+        """Verify cargo requirements."""
         for release, requirement, expected in (
             ("1.9.0", "^1.2.3", True), ("2.0.0", "1.2", False),
             ("0.2.9", "^0.2.3", True), ("0.3.0", "^0.2.3", False),
@@ -24,6 +26,7 @@ class VersionTests(unittest.TestCase):
                 self.assertEqual(satisfies(release, requirement), expected)
 
     def test_sparse_paths(self):
+        """Verify sparse paths."""
         for name, expected in (
             ("a", "1/a"), ("ab", "2/ab"), ("ABC", "3/a/abc"),
             ("itoa", "it/oa/itoa"),
@@ -32,7 +35,9 @@ class VersionTests(unittest.TestCase):
 
 
 class RegistryTests(unittest.TestCase):
+    """Check registry metadata parsing and version selection."""
     def test_version_selection_and_renamed_dependency(self):
+        """Verify version selection and renamed dependency."""
         requests = []
         records = {
             "root": [{"vers": "1.0.0", "deps": [
@@ -50,6 +55,7 @@ class RegistryTests(unittest.TestCase):
         }
 
         def fetch(url):
+            """Return fixture metadata for the requested URL."""
             requests.append(url)
             name = url.rsplit("/", 1)[1]
             return "\n".join(json.dumps(r) for r in records[name])
@@ -64,6 +70,7 @@ class RegistryTests(unittest.TestCase):
             registry.resolve("real", "=3.0.0")
 
     def test_invalid_json(self):
+        """Verify invalid json."""
         registry = Registry("https://example.test", lambda url: "{invalid")
         with self.assertRaises(ValueError):
             registry.root("a")

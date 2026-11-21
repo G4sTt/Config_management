@@ -12,7 +12,9 @@ FIXTURES = Path(__file__).with_name("repositories")
 
 
 class ReverseTests(unittest.TestCase):
+    """Check reverse graph traversal and paginated API results."""
     def test_direct_and_transitive_dependents(self):
+        """Verify direct and transitive dependents."""
         repository = LocalRepository(FIXTURES / "reverse.json")
         graph = build_graph("B", repository.dependents, 3)
         self.assertEqual(graph.as_dict(), {
@@ -21,12 +23,14 @@ class ReverseTests(unittest.TestCase):
         self.assertNotIn("F", graph.edges)
 
     def test_reverse_depth_limit(self):
+        """Verify reverse depth limit."""
         repository = LocalRepository(FIXTURES / "reverse.json")
         graph = build_graph("B", repository.dependents, 1)
         self.assertEqual(set(graph.edges), {"A", "B", "C"})
         self.assertEqual(graph.edges["C"], ())
 
     def test_reverse_cycle(self):
+        """Verify reverse cycle."""
         repository = LocalRepository(FIXTURES / "cycle.json")
         graph = build_graph("A", repository.dependents, 10)
         self.assertEqual(graph.edges["A"], ("C",))
@@ -34,9 +38,11 @@ class ReverseTests(unittest.TestCase):
         self.assertEqual(len(graph.edges), 3)
 
     def test_reverse_api_pagination_and_version_filter(self):
+        """Verify reverse api pagination and version filter."""
         calls = []
 
         def fetch(url):
+            """Return fixture metadata for the requested URL."""
             calls.append(url)
             if url.endswith("config.json"):
                 return json.dumps({"api": "https://api.test"})

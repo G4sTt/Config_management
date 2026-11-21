@@ -10,6 +10,7 @@ PROJECT = Path(__file__).resolve().parents[1]
 
 
 class CliTests(unittest.TestCase):
+    """Check CLI stages, output streams and error handling."""
     def run_cli(self, *args):
         """Launch the real entry point from an unrelated directory."""
         return subprocess.run(
@@ -19,6 +20,7 @@ class CliTests(unittest.TestCase):
         )
 
     def test_dot_and_ascii_are_separate(self):
+        """Verify dot and ascii are separate."""
         with tempfile.TemporaryDirectory() as folder:
             output = Path(folder) / "space here" / "graph.dot"
             result = self.run_cli(
@@ -30,6 +32,7 @@ class CliTests(unittest.TestCase):
             self.assertEqual(output.read_text(), result.stdout)
 
     def test_config_stage_and_reverse(self):
+        """Verify config stage and reverse."""
         result = self.run_cli(
             "--config", PROJECT / "configs/simple.ini", "--stage", "config"
         )
@@ -42,6 +45,7 @@ class CliTests(unittest.TestCase):
         self.assertIn('"B" -> "A";', result.stdout)
 
     def test_bad_file_and_config_overwrite(self):
+        """Verify bad file and config overwrite."""
         result = self.run_cli("--config", PROJECT / "configs/missing.ini")
         self.assertEqual(result.returncode, 2)
         with tempfile.TemporaryDirectory() as folder:

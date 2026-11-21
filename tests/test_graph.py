@@ -11,11 +11,14 @@ FIXTURES = Path(__file__).with_name("repositories")
 
 
 class GraphTests(unittest.TestCase):
+    """Check breadth-first layers, depths and cyclic graphs."""
     def test_breadth_first_order_and_shared_dependency(self):
+        """Verify breadth first order and shared dependency."""
         repository = LocalRepository(FIXTURES / "simple.json")
         calls = []
 
         def neighbors(package):
+            """Record a visit and return the node dependencies."""
             calls.append(package)
             return repository.dependencies(package)
 
@@ -26,6 +29,7 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(graph.edges["C"], ("D",))
 
     def test_depth_zero_and_one(self):
+        """Verify depth zero and one."""
         repository = LocalRepository(FIXTURES / "simple.json")
         for depth, nodes in ((0, {"A"}), (1, {"A", "B", "C"})):
             graph = build_graph("A", repository.dependencies, depth)
@@ -34,6 +38,7 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(build_graph("A", lambda _: (), 0).as_dict(), {"A": []})
 
     def test_cycle_terminates_and_keeps_back_edge(self):
+        """Verify cycle terminates and keeps back edge."""
         repository = LocalRepository(FIXTURES / "cycle.json")
         graph = build_graph("A", repository.dependencies, 20)
         self.assertEqual(len(graph.edges), 4)
@@ -41,6 +46,7 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(graph.depths["A"], 0)
 
     def test_isolated_package(self):
+        """Verify isolated package."""
         repository = LocalRepository(FIXTURES / "isolated.json")
         self.assertEqual(
             build_graph("A", repository.dependencies, 3).as_dict(), {"A": []}
@@ -49,6 +55,7 @@ class GraphTests(unittest.TestCase):
             repository.root("Z")
 
     def test_invalid_repository(self):
+        """Verify invalid repository."""
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "bad.json"
             for text in ('{bad', '[]', '{"a":[]}', '{"A":["B"]}', '{"A":{}}'):

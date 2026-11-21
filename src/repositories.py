@@ -11,6 +11,7 @@ class LocalRepository:
     """A complete local repository with uppercase package names."""
 
     def __init__(self, path):
+        """Load and validate a complete JSON adjacency map."""
         try:
             data = json.loads(path.read_text(encoding="utf-8-sig"))
         except json.JSONDecodeError as error:

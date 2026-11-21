@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass, field
 
+ROOT_DEPTH = 0
+
 
 @dataclass
 class Graph:
@@ -36,8 +38,8 @@ def visit_level(graph, frontier, neighbors, level):
 
 def build_graph(root, neighbors, max_depth):
     """Build a depth-bounded graph, preserving back edges and shared nodes."""
-    if max_depth < 0:
+    if max_depth < ROOT_DEPTH:
         raise ValueError("Depth must be nonnegative")
-    graph = Graph(root, max_depth, {root: 0}, {root: ()})
-    visit_level(graph, [root], neighbors, 0)
+    graph = Graph(root, max_depth, {root: ROOT_DEPTH}, {root: ()})
+    visit_level(graph, [root], neighbors, ROOT_DEPTH)
     return graph

@@ -14,6 +14,7 @@ TEMPLATE = (
 
 
 class SettingsTests(unittest.TestCase):
+    """Check INI settings, validation and relative file paths."""
     def parse(self, content):
         """Load a temporary INI and repository."""
         with tempfile.TemporaryDirectory() as folder:
@@ -24,12 +25,14 @@ class SettingsTests(unittest.TestCase):
             return load_settings(path)
 
     def test_valid_relative_path(self):
+        """Verify valid relative path."""
         config = self.parse(TEMPLATE)
         self.assertTrue(Path(config.repository).is_absolute())
         self.assertEqual(config.max_depth, 3)
         self.assertEqual(config.package, "A")
 
     def test_invalid_values_for_all_parameters(self):
+        """Verify invalid values for all parameters."""
         replacements = (
             ("package=A", "package=a"),
             ("repository=repo.json", "repository=missing.json"),
@@ -44,6 +47,7 @@ class SettingsTests(unittest.TestCase):
                     self.parse(TEMPLATE.replace(before, after))
 
     def test_missing_extra_and_duplicate_keys(self):
+        """Verify missing extra and duplicate keys."""
         for content in (
             TEMPLATE.replace("ascii_tree=true\n", ""),
             TEMPLATE + "unknown=1\n",
@@ -55,6 +59,7 @@ class SettingsTests(unittest.TestCase):
                     self.parse(content)
 
     def test_real_registry_configuration(self):
+        """Verify real registry configuration."""
         text = TEMPLATE.replace("package=A", "package=itoa@1.0.15")
         text = text.replace("repository=repo.json",
                             "repository=https://index.crates.io")
